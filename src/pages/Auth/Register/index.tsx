@@ -28,16 +28,13 @@ const Register = () => {
 
     try {
       setLoading(true);
-      // 模拟注册延迟
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // 保存用户信息到localStorage
       localStorage.setItem('user_email', email);
       localStorage.setItem('user_username', username);
       
       setSuccess('注册成功！正在跳转...');
       
-      // 2秒后跳转到登录页
       setTimeout(() => {
         navigate('/login');
       }, 2000);
@@ -52,32 +49,41 @@ const Register = () => {
     <div
       style={{
         width: '100%',
-        maxWidth: 420,
-        padding: '40px 32px',
-        borderRadius: 20,
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-        background: '#fff',
-        border: '1px solid #e5e7eb',
+        maxWidth: 440,
+        padding: '64px 48px',
+        borderRadius: 32,
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+        background: '#ffffff',
+        border: '1px solid rgba(0, 0, 0, 0.04)',
       }}
     >
-      <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
+      <div style={{ marginBottom: 48 }}>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: 32,
+            fontWeight: 600,
+            color: '#1a1a1a',
+            marginBottom: 12,
+            letterSpacing: '-0.02em',
+          }}
+        >
           创建账号
         </h1>
-        <p style={{ margin: 0, color: '#6b7280', fontSize: 15 }}>
+        <p style={{ margin: 0, color: '#666', fontSize: 15, lineHeight: 1.6 }}>
           加入智创千面，开始你的创作之旅
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div>
           <label
             style={{
               display: 'block',
-              marginBottom: 8,
+              marginBottom: 10,
               fontSize: 14,
               fontWeight: 500,
-              color: '#374151',
+              color: '#1a1a1a',
             }}
           >
             用户名
@@ -92,19 +98,22 @@ const Register = () => {
             placeholder="请输入用户名"
             style={{
               width: '100%',
-              padding: '12px 16px',
-              borderRadius: 10,
-              border: '1px solid #d1d5db',
+              padding: '16px 20px',
+              borderRadius: 16,
+              border: '1px solid rgba(0, 0, 0, 0.08)',
               fontSize: 15,
-              transition: 'all 0.2s',
+              transition: 'all 0.2s ease',
               outline: 'none',
+              background: '#fafafa',
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#3b82f6';
-              e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.2)';
+              e.target.style.background = '#fff';
+              e.target.style.boxShadow = '0 0 0 4px rgba(0, 0, 0, 0.04)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#d1d5db';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+              e.target.style.background = '#fafafa';
               e.target.style.boxShadow = 'none';
             }}
           />
@@ -114,10 +123,10 @@ const Register = () => {
           <label
             style={{
               display: 'block',
-              marginBottom: 8,
+              marginBottom: 10,
               fontSize: 14,
               fontWeight: 500,
-              color: '#374151',
+              color: '#1a1a1a',
             }}
           >
             邮箱
@@ -133,19 +142,22 @@ const Register = () => {
             placeholder="请输入邮箱"
             style={{
               width: '100%',
-              padding: '12px 16px',
-              borderRadius: 10,
-              border: '1px solid #d1d5db',
+              padding: '16px 20px',
+              borderRadius: 16,
+              border: '1px solid rgba(0, 0, 0, 0.08)',
               fontSize: 15,
-              transition: 'all 0.2s',
+              transition: 'all 0.2s ease',
               outline: 'none',
+              background: '#fafafa',
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#3b82f6';
-              e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.2)';
+              e.target.style.background = '#fff';
+              e.target.style.boxShadow = '0 0 0 4px rgba(0, 0, 0, 0.04)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#d1d5db';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+              e.target.style.background = '#fafafa';
               e.target.style.boxShadow = 'none';
             }}
           />
@@ -155,10 +167,10 @@ const Register = () => {
           <label
             style={{
               display: 'block',
-              marginBottom: 8,
+              marginBottom: 10,
               fontSize: 14,
               fontWeight: 500,
-              color: '#374151',
+              color: '#1a1a1a',
             }}
           >
             密码
@@ -174,19 +186,22 @@ const Register = () => {
             placeholder="至少6位字符"
             style={{
               width: '100%',
-              padding: '12px 16px',
-              borderRadius: 10,
-              border: '1px solid #d1d5db',
+              padding: '16px 20px',
+              borderRadius: 16,
+              border: '1px solid rgba(0, 0, 0, 0.08)',
               fontSize: 15,
-              transition: 'all 0.2s',
+              transition: 'all 0.2s ease',
               outline: 'none',
+              background: '#fafafa',
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#3b82f6';
-              e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.2)';
+              e.target.style.background = '#fff';
+              e.target.style.boxShadow = '0 0 0 4px rgba(0, 0, 0, 0.04)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#d1d5db';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+              e.target.style.background = '#fafafa';
               e.target.style.boxShadow = 'none';
             }}
           />
@@ -196,10 +211,10 @@ const Register = () => {
           <label
             style={{
               display: 'block',
-              marginBottom: 8,
+              marginBottom: 10,
               fontSize: 14,
               fontWeight: 500,
-              color: '#374151',
+              color: '#1a1a1a',
             }}
           >
             确认密码
@@ -215,19 +230,22 @@ const Register = () => {
             placeholder="请再次输入密码"
             style={{
               width: '100%',
-              padding: '12px 16px',
-              borderRadius: 10,
-              border: '1px solid #d1d5db',
+              padding: '16px 20px',
+              borderRadius: 16,
+              border: '1px solid rgba(0, 0, 0, 0.08)',
               fontSize: 15,
-              transition: 'all 0.2s',
+              transition: 'all 0.2s ease',
               outline: 'none',
+              background: '#fafafa',
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#3b82f6';
-              e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.2)';
+              e.target.style.background = '#fff';
+              e.target.style.boxShadow = '0 0 0 4px rgba(0, 0, 0, 0.04)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#d1d5db';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+              e.target.style.background = '#fafafa';
               e.target.style.boxShadow = 'none';
             }}
           />
@@ -236,12 +254,12 @@ const Register = () => {
         {error && (
           <div
             style={{
-              padding: '12px 16px',
+              padding: '14px 18px',
               background: '#fef2f2',
               color: '#dc2626',
-              borderRadius: 10,
+              borderRadius: 16,
               fontSize: 14,
-              border: '1px solid #fecaca',
+              border: '1px solid rgba(220, 38, 38, 0.1)',
             }}
           >
             {error}
@@ -251,12 +269,12 @@ const Register = () => {
         {success && (
           <div
             style={{
-              padding: '12px 16px',
+              padding: '14px 18px',
               background: '#f0fdf4',
               color: '#16a34a',
-              borderRadius: 10,
+              borderRadius: 16,
               fontSize: 14,
-              border: '1px solid #bbf7d0',
+              border: '1px solid rgba(22, 163, 74, 0.1)',
             }}
           >
             {success}
@@ -267,30 +285,30 @@ const Register = () => {
           type="submit"
           disabled={loading}
           style={{
-            marginTop: 4,
-            padding: '14px 0',
-            borderRadius: 10,
+            marginTop: 8,
+            padding: '16px 0',
+            borderRadius: 16,
             border: 'none',
-            background: loading ? '#9ca3af' : '#10b981',
+            background: loading ? '#ccc' : '#1a1a1a',
             color: '#fff',
             fontWeight: 600,
-            fontSize: 16,
+            fontSize: 15,
             cursor: loading ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s',
-            boxShadow: loading ? 'none' : '0 4px 12px rgba(16, 185, 129, 0.3)',
+            transition: 'all 0.2s ease',
+            boxShadow: loading ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.08)',
           }}
           onMouseEnter={(e) => {
             if (!loading) {
-              e.currentTarget.style.background = '#059669';
+              e.currentTarget.style.background = '#333';
               e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.4)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.12)';
             }
           }}
           onMouseLeave={(e) => {
             if (!loading) {
-              e.currentTarget.style.background = '#10b981';
+              e.currentTarget.style.background = '#1a1a1a';
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
             }
           }}
         >
@@ -298,18 +316,17 @@ const Register = () => {
         </button>
       </form>
 
-      <div style={{ marginTop: 24, textAlign: 'center', fontSize: 14, color: '#6b7280' }}>
+      <div style={{ marginTop: 32, textAlign: 'center', fontSize: 14, color: '#666' }}>
         已有账号？{' '}
         <Link
           to="/login"
           style={{
-            color: '#3b82f6',
-            textDecoration: 'none',
+            color: '#1a1a1a',
             fontWeight: 600,
-            transition: 'color 0.2s',
+            transition: 'color 0.2s ease',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#2563eb')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#3b82f6')}
+          onMouseEnter={(e) => (e.currentTarget.style.color = '#333')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = '#1a1a1a')}
         >
           立即登录
         </Link>

@@ -8,6 +8,7 @@ import Login from '../pages/Auth/Login';
 import Register from '../pages/Auth/Register';
 import ForgotPassword from '../pages/Auth/ForgotPassword';
 import Profile from '../pages/Auth/Profile';
+import Home from '../pages/Home';
 
 // 路由守卫组件
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
     path: '/',
     element: <MainLayout />,
     children: [
+      { index: true, element: <Home /> },
       // 其他页面由B/C/D负责，先占位
       { path: 'generate', element: <div>生成页（B负责）</div> },
       { path: 'history', element: <div>历史页（C负责）</div> },

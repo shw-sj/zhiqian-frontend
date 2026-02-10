@@ -46,16 +46,16 @@ const Profile = () => {
 
   if (loading && !userInfo) {
     return (
-      <div style={{ textAlign: 'center', padding: 60 }}>
-        <div style={{ fontSize: 16, color: '#6b7280' }}>加载中...</div>
+      <div style={{ textAlign: 'center', padding: 80 }}>
+        <div style={{ fontSize: 16, color: '#666' }}>加载中...</div>
       </div>
     );
   }
 
   if (!userInfo) {
     return (
-      <div style={{ textAlign: 'center', padding: 60 }}>
-        <div style={{ fontSize: 16, color: '#6b7280' }}>暂无用户信息</div>
+      <div style={{ textAlign: 'center', padding: 80 }}>
+        <div style={{ fontSize: 16, color: '#666' }}>暂无用户信息</div>
       </div>
     );
   }
@@ -63,21 +63,30 @@ const Profile = () => {
   return (
     <div
       style={{
-        maxWidth: 700,
+        maxWidth: 720,
         margin: '0 auto',
-        padding: '40px 32px',
-        borderRadius: 20,
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-        border: '1px solid #e5e7eb',
-        background: '#fff',
+        padding: '64px 48px',
+        borderRadius: 32,
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+        border: '1px solid rgba(0, 0, 0, 0.04)',
+        background: '#ffffff',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 48 }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: '#111827', marginBottom: 4 }}>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: 32,
+              fontWeight: 600,
+              color: '#1a1a1a',
+              marginBottom: 12,
+              letterSpacing: '-0.02em',
+            }}
+          >
             个人中心
           </h1>
-          <p style={{ margin: 0, color: '#6b7280', fontSize: 15 }}>
+          <p style={{ margin: 0, color: '#666', fontSize: 15, lineHeight: 1.6 }}>
             管理你的账户信息和偏好设置
           </p>
         </div>
@@ -85,26 +94,26 @@ const Profile = () => {
           <button
             onClick={() => setIsEditing(true)}
             style={{
-              padding: '10px 20px',
-              background: '#3b82f6',
+              padding: '12px 24px',
+              background: '#1a1a1a',
               color: '#fff',
               border: 'none',
-              borderRadius: 10,
+              borderRadius: 24,
               cursor: 'pointer',
               fontSize: 14,
               fontWeight: 600,
-              transition: 'all 0.2s',
-              boxShadow: '0 2px 8px rgba(59, 130, 246, 0.2)',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#2563eb';
+              e.currentTarget.style.background = '#333';
               e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.12)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#3b82f6';
+              e.currentTarget.style.background = '#1a1a1a';
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(59, 130, 246, 0.2)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
             }}
           >
             编辑资料
@@ -115,13 +124,13 @@ const Profile = () => {
       {error && (
         <div
           style={{
-            padding: '12px 16px',
-            marginBottom: 24,
+            padding: '14px 18px',
+            marginBottom: 32,
             background: '#fef2f2',
             color: '#dc2626',
-            borderRadius: 10,
+            borderRadius: 16,
             fontSize: 14,
-            border: '1px solid #fecaca',
+            border: '1px solid rgba(220, 38, 38, 0.1)',
           }}
         >
           {error}
@@ -130,15 +139,15 @@ const Profile = () => {
 
       {isEditing ? (
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
             <div>
               <label
                 style={{
                   display: 'block',
-                  marginBottom: 8,
+                  marginBottom: 12,
                   fontSize: 14,
                   fontWeight: 600,
-                  color: '#374151',
+                  color: '#1a1a1a',
                 }}
               >
                 用户名
@@ -151,19 +160,22 @@ const Profile = () => {
                 placeholder="请输入用户名"
                 style={{
                   width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: 10,
+                  padding: '16px 20px',
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  borderRadius: 16,
                   fontSize: 15,
-                  transition: 'all 0.2s',
+                  transition: 'all 0.2s ease',
                   outline: 'none',
+                  background: '#fafafa',
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#3b82f6';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                  e.target.style.borderColor = 'rgba(0, 0, 0, 0.2)';
+                  e.target.style.background = '#fff';
+                  e.target.style.boxShadow = '0 0 0 4px rgba(0, 0, 0, 0.04)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#d1d5db';
+                  e.target.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+                  e.target.style.background = '#fafafa';
                   e.target.style.boxShadow = 'none';
                 }}
               />
@@ -172,10 +184,10 @@ const Profile = () => {
               <label
                 style={{
                   display: 'block',
-                  marginBottom: 8,
+                  marginBottom: 12,
                   fontSize: 14,
                   fontWeight: 600,
-                  color: '#374151',
+                  color: '#1a1a1a',
                 }}
               >
                 邮箱
@@ -188,19 +200,22 @@ const Profile = () => {
                 placeholder="请输入邮箱"
                 style={{
                   width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: 10,
+                  padding: '16px 20px',
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  borderRadius: 16,
                   fontSize: 15,
-                  transition: 'all 0.2s',
+                  transition: 'all 0.2s ease',
                   outline: 'none',
+                  background: '#fafafa',
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#3b82f6';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                  e.target.style.borderColor = 'rgba(0, 0, 0, 0.2)';
+                  e.target.style.background = '#fff';
+                  e.target.style.boxShadow = '0 0 0 4px rgba(0, 0, 0, 0.04)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#d1d5db';
+                  e.target.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+                  e.target.style.background = '#fafafa';
                   e.target.style.boxShadow = 'none';
                 }}
               />
@@ -209,26 +224,26 @@ const Profile = () => {
               <label
                 style={{
                   display: 'block',
-                  marginBottom: 8,
+                  marginBottom: 12,
                   fontSize: 14,
                   fontWeight: 600,
-                  color: '#374151',
+                  color: '#1a1a1a',
                 }}
               >
                 角色
               </label>
               <div
                 style={{
-                  padding: '12px 16px',
-                  color: '#6b7280',
-                  background: '#f3f4f6',
-                  borderRadius: 10,
+                  padding: '16px 20px',
+                  color: '#666',
+                  background: '#fafafa',
+                  borderRadius: 16,
                   fontSize: 15,
                 }}
               >
                 {userInfo.role === 'admin' ? '管理员' : '普通用户'}
               </div>
-              <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 6 }}>
+              <div style={{ fontSize: 13, color: '#999', marginTop: 8 }}>
                 角色不可修改
               </div>
             </div>
@@ -236,52 +251,52 @@ const Profile = () => {
               <label
                 style={{
                   display: 'block',
-                  marginBottom: 8,
+                  marginBottom: 12,
                   fontSize: 14,
                   fontWeight: 600,
-                  color: '#374151',
+                  color: '#1a1a1a',
                 }}
               >
                 注册时间
               </label>
               <div
                 style={{
-                  padding: '12px 16px',
-                  color: '#6b7280',
-                  background: '#f3f4f6',
-                  borderRadius: 10,
+                  padding: '16px 20px',
+                  color: '#666',
+                  background: '#fafafa',
+                  borderRadius: 16,
                   fontSize: 15,
                 }}
               >
                 {new Date(userInfo.createdAt).toLocaleString()}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+            <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
               <button
                 type="submit"
                 disabled={loading}
                 style={{
                   flex: 1,
-                  padding: '12px 20px',
-                  background: loading ? '#9ca3af' : '#3b82f6',
+                  padding: '16px 24px',
+                  background: loading ? '#ccc' : '#1a1a1a',
                   color: '#fff',
                   border: 'none',
-                  borderRadius: 10,
+                  borderRadius: 16,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   fontSize: 15,
                   fontWeight: 600,
-                  transition: 'all 0.2s',
-                  boxShadow: loading ? 'none' : '0 2px 8px rgba(59, 130, 246, 0.2)',
+                  transition: 'all 0.2s ease',
+                  boxShadow: loading ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.08)',
                 }}
                 onMouseEnter={(e) => {
                   if (!loading) {
-                    e.currentTarget.style.background = '#2563eb';
+                    e.currentTarget.style.background = '#333';
                     e.currentTarget.style.transform = 'translateY(-1px)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!loading) {
-                    e.currentTarget.style.background = '#3b82f6';
+                    e.currentTarget.style.background = '#1a1a1a';
                     e.currentTarget.style.transform = 'translateY(0)';
                   }
                 }}
@@ -294,26 +309,26 @@ const Profile = () => {
                 disabled={loading}
                 style={{
                   flex: 1,
-                  padding: '12px 20px',
+                  padding: '16px 24px',
                   background: '#fff',
-                  color: '#374151',
-                  border: '1px solid #d1d5db',
-                  borderRadius: 10,
+                  color: '#666',
+                  border: '1px solid rgba(0, 0, 0, 0.1)',
+                  borderRadius: 16,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   fontSize: 15,
                   fontWeight: 600,
-                  transition: 'all 0.2s',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
                   if (!loading) {
-                    e.currentTarget.style.background = '#f9fafb';
-                    e.currentTarget.style.borderColor = '#9ca3af';
+                    e.currentTarget.style.background = '#fafafa';
+                    e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.15)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!loading) {
                     e.currentTarget.style.background = '#fff';
-                    e.currentTarget.style.borderColor = '#d1d5db';
+                    e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.1)';
                   }
                 }}
               >
@@ -326,61 +341,61 @@ const Profile = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           <div
             style={{
-              padding: '20px',
-              background: '#f9fafb',
-              borderRadius: 12,
-              border: '1px solid #e5e7eb',
+              padding: '32px',
+              background: '#fafafa',
+              borderRadius: 20,
+              border: '1px solid rgba(0, 0, 0, 0.04)',
             }}
           >
-            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>
+            <div style={{ fontSize: 13, color: '#666', marginBottom: 10, fontWeight: 500 }}>
               用户名
             </div>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#111827' }}>
+            <div style={{ fontSize: 20, fontWeight: 600, color: '#1a1a1a' }}>
               {userInfo.username}
             </div>
           </div>
           <div
             style={{
-              padding: '20px',
-              background: '#f9fafb',
-              borderRadius: 12,
-              border: '1px solid #e5e7eb',
+              padding: '32px',
+              background: '#fafafa',
+              borderRadius: 20,
+              border: '1px solid rgba(0, 0, 0, 0.04)',
             }}
           >
-            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>
+            <div style={{ fontSize: 13, color: '#666', marginBottom: 10, fontWeight: 500 }}>
               邮箱
             </div>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#111827' }}>
+            <div style={{ fontSize: 20, fontWeight: 600, color: '#1a1a1a' }}>
               {userInfo.email}
             </div>
           </div>
           <div
             style={{
-              padding: '20px',
-              background: '#f9fafb',
-              borderRadius: 12,
-              border: '1px solid #e5e7eb',
+              padding: '32px',
+              background: '#fafafa',
+              borderRadius: 20,
+              border: '1px solid rgba(0, 0, 0, 0.04)',
             }}
           >
-            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>
+            <div style={{ fontSize: 13, color: '#666', marginBottom: 10, fontWeight: 500 }}>
               角色
             </div>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#111827' }}>
+            <div style={{ fontSize: 20, fontWeight: 600, color: '#1a1a1a' }}>
               {userInfo.role === 'admin' ? '管理员' : '普通用户'}
             </div>
           </div>
           <div
             style={{
-              padding: '20px',
-              background: '#f9fafb',
-              borderRadius: 12,
-              border: '1px solid #e5e7eb',
+              padding: '32px',
+              background: '#fafafa',
+              borderRadius: 20,
+              border: '1px solid rgba(0, 0, 0, 0.04)',
             }}
           >
-            <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 6, fontWeight: 500 }}>
+            <div style={{ fontSize: 13, color: '#666', marginBottom: 10, fontWeight: 500 }}>
               注册时间
             </div>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#111827' }}>
+            <div style={{ fontSize: 20, fontWeight: 600, color: '#1a1a1a' }}>
               {new Date(userInfo.createdAt).toLocaleString()}
             </div>
           </div>

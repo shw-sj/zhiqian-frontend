@@ -14,7 +14,6 @@ const ForgotPassword = () => {
 
     try {
       setLoading(true);
-      // 模拟发送延迟
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       setSuccess('重置链接已发送到你的邮箱，如未收到请检查垃圾箱');
@@ -29,32 +28,41 @@ const ForgotPassword = () => {
     <div
       style={{
         width: '100%',
-        maxWidth: 420,
-        padding: '40px 32px',
-        borderRadius: 20,
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-        background: '#fff',
-        border: '1px solid #e5e7eb',
+        maxWidth: 440,
+        padding: '64px 48px',
+        borderRadius: 32,
+        boxShadow: '0 4px 24px rgba(0, 0, 0, 0.06)',
+        background: '#ffffff',
+        border: '1px solid rgba(0, 0, 0, 0.04)',
       }}
     >
-      <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, color: '#111827', marginBottom: 8 }}>
+      <div style={{ marginBottom: 48 }}>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: 32,
+            fontWeight: 600,
+            color: '#1a1a1a',
+            marginBottom: 12,
+            letterSpacing: '-0.02em',
+          }}
+        >
           找回密码
         </h1>
-        <p style={{ margin: 0, color: '#6b7280', fontSize: 15 }}>
+        <p style={{ margin: 0, color: '#666', fontSize: 15, lineHeight: 1.6 }}>
           输入注册时使用的邮箱，我们会发送重置链接
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div>
           <label
             style={{
               display: 'block',
-              marginBottom: 8,
+              marginBottom: 10,
               fontSize: 14,
               fontWeight: 500,
-              color: '#374151',
+              color: '#1a1a1a',
             }}
           >
             邮箱
@@ -71,19 +79,22 @@ const ForgotPassword = () => {
             placeholder="请输入注册邮箱"
             style={{
               width: '100%',
-              padding: '12px 16px',
-              borderRadius: 10,
-              border: '1px solid #d1d5db',
+              padding: '16px 20px',
+              borderRadius: 16,
+              border: '1px solid rgba(0, 0, 0, 0.08)',
               fontSize: 15,
-              transition: 'all 0.2s',
+              transition: 'all 0.2s ease',
               outline: 'none',
+              background: '#fafafa',
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = '#3b82f6';
-              e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.2)';
+              e.target.style.background = '#fff';
+              e.target.style.boxShadow = '0 0 0 4px rgba(0, 0, 0, 0.04)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = '#d1d5db';
+              e.target.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+              e.target.style.background = '#fafafa';
               e.target.style.boxShadow = 'none';
             }}
           />
@@ -92,12 +103,12 @@ const ForgotPassword = () => {
         {error && (
           <div
             style={{
-              padding: '12px 16px',
+              padding: '14px 18px',
               background: '#fef2f2',
               color: '#dc2626',
-              borderRadius: 10,
+              borderRadius: 16,
               fontSize: 14,
-              border: '1px solid #fecaca',
+              border: '1px solid rgba(220, 38, 38, 0.1)',
             }}
           >
             {error}
@@ -107,12 +118,12 @@ const ForgotPassword = () => {
         {success && (
           <div
             style={{
-              padding: '12px 16px',
+              padding: '14px 18px',
               background: '#f0fdf4',
               color: '#16a34a',
-              borderRadius: 10,
+              borderRadius: 16,
               fontSize: 14,
-              border: '1px solid #bbf7d0',
+              border: '1px solid rgba(22, 163, 74, 0.1)',
             }}
           >
             {success}
@@ -123,30 +134,30 @@ const ForgotPassword = () => {
           type="submit"
           disabled={loading}
           style={{
-            marginTop: 4,
-            padding: '14px 0',
-            borderRadius: 10,
+            marginTop: 8,
+            padding: '16px 0',
+            borderRadius: 16,
             border: 'none',
-            background: loading ? '#9ca3af' : '#6366f1',
+            background: loading ? '#ccc' : '#1a1a1a',
             color: '#fff',
             fontWeight: 600,
-            fontSize: 16,
+            fontSize: 15,
             cursor: loading ? 'not-allowed' : 'pointer',
-            transition: 'all 0.2s',
-            boxShadow: loading ? 'none' : '0 4px 12px rgba(99, 102, 241, 0.3)',
+            transition: 'all 0.2s ease',
+            boxShadow: loading ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.08)',
           }}
           onMouseEnter={(e) => {
             if (!loading) {
-              e.currentTarget.style.background = '#4f46e5';
+              e.currentTarget.style.background = '#333';
               e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(99, 102, 241, 0.4)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.12)';
             }
           }}
           onMouseLeave={(e) => {
             if (!loading) {
-              e.currentTarget.style.background = '#6366f1';
+              e.currentTarget.style.background = '#1a1a1a';
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.3)';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.08)';
             }
           }}
         >
@@ -154,18 +165,17 @@ const ForgotPassword = () => {
         </button>
       </form>
 
-      <div style={{ marginTop: 24, textAlign: 'center', fontSize: 14, color: '#6b7280' }}>
+      <div style={{ marginTop: 32, textAlign: 'center', fontSize: 14, color: '#666' }}>
         想起密码了？{' '}
         <Link
           to="/login"
           style={{
-            color: '#3b82f6',
-            textDecoration: 'none',
+            color: '#1a1a1a',
             fontWeight: 600,
-            transition: 'color 0.2s',
+            transition: 'color 0.2s ease',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#2563eb')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#3b82f6')}
+          onMouseEnter={(e) => (e.currentTarget.style.color = '#333')}
+          onMouseLeave={(e) => (e.currentTarget.style.color = '#1a1a1a')}
         >
           返回登录
         </Link>
