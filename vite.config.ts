@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 // vite.config.ts
 export default defineConfig({
   plugins: [react()],
-  server: { host: true, port: 3000 }
+  server: { host: true, port: 3002 }
 })
