@@ -32,16 +32,32 @@ const MainLayout = () => {
         }}
       >
         <div
+          onClick={() => navigate('/')}
           style={{
             fontWeight: 600,
             fontSize: 20,
             color: '#1a1a1a',
             letterSpacing: '-0.02em',
+            cursor: 'pointer',
           }}
         >
           智创千面
         </div>
         <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+          <Link
+            to="/"
+            style={{
+              color: '#666',
+              fontSize: 15,
+              fontWeight: 500,
+              padding: '8px 0',
+              transition: 'color 0.2s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#1a1a1a')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#666')}
+          >
+            首页
+          </Link>
           <Link
             to="/generate"
             style={{

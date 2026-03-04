@@ -11,6 +11,15 @@ interface Message {
   isError?: boolean;
 }
 
+interface HistoryEntry {
+  id: string;
+  createdAt: string;
+  title: string;
+  messages: Message[];
+}
+
+const HISTORY_STORAGE_KEY = 'chat_history';
+
 const GeneratePage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -24,6 +33,29 @@ const GeneratePage = () => {
 
   // 生成唯一 ID
   const generateId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+  const saveCurrentConversationToHistory = (conversation: Message[]) => {
+    if (!conversation.length) return;
+    const firstUserMessage = conversation.find((m) => m.role === 'user');
+    const title =
+      (firstUserMessage?.content || '').trim().slice(0, 40) || '无标题对话';
+
+    const entry: HistoryEntry = {
+      id: generateId(),
+      createdAt: new Date().toISOString(),
+      title,
+      messages: conversation,
+    };
+
+    try {
+      const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+      const list: HistoryEntry[] = raw ? JSON.parse(raw) : [];
+      const next = [entry, ...(Array.isArray(list) ? list : [])].slice(0, 50);
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // ignore storage error
+    }
+  };
 
   // 发送消息
   const handleSend = async () => {
@@ -79,6 +111,16 @@ const GeneratePage = () => {
     }
   };
 
+  const handleClearConversation = () => {
+    if (!messages.length) {
+      setMessages([]);
+      return;
+    }
+    // 清空前先保存到历史
+    saveCurrentConversationToHistory(messages);
+    setMessages([]);
+  };
+
   // 回车发送
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -94,7 +136,7 @@ const GeneratePage = () => {
         <div className="chat-actions">
           <button
             className="action-button"
-            onClick={() => setMessages([])}
+            onClick={handleClearConversation}
           >
             清空对话
           </button>
