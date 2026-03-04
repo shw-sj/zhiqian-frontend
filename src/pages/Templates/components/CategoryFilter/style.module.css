@@ -1,0 +1,47 @@
+.filter {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
+.category {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.category:hover {
+  background: #f0f0f0;
+  border-color: #aaa;
+}
+
+.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.active:hover {
+  background: #0056b3;
+}
+
+.count {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 2px 6px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.active .count {
+  background: rgba(255, 255, 255, 0.2);
+}

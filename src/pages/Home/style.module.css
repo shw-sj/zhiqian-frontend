@@ -1,0 +1,33 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.section {
+  margin-top: 60px;
+}
+.sectionTitle {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+}
+.membershipPromo {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.membershipPromo h2 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.membershipPromo p {
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+  color: #666;
+}
