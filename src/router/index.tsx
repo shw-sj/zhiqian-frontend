@@ -10,6 +10,7 @@ import ForgotPassword from '../pages/Auth/ForgotPassword';
 import Profile from '../pages/Auth/Profile';
 import Home from '../pages/Home';
 import GeneratePage from '../generate';
+import History from '../pages/History';
 
 // 路由守卫组件
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -24,8 +25,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       // 其他页面由B/C/D负责，先占位
-      { path: 'generate', element:  <GeneratePage /> },
-      { path: 'history', element: <div>历史页（C负责）</div> },
+      { path: 'generate', element: <GeneratePage /> },
+      { path: 'history', element: <History /> },
       { path: 'templates', element: <div>模板市场（D负责）</div> },
     ],
   },
