@@ -62,7 +62,7 @@ const MainLayout = () => {
             首页
           </Link>
           <Link
-            to="/generate"
+            to="/"
             style={{
               color: "#666",
               fontSize: 15,

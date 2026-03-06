@@ -4,10 +4,12 @@ export interface IUserInfo {
   username: string;
   email: string;
   avatar?: string;
-  role: 'user' | 'admin';
+  role: "user" | "admin";
+  membership?: "basic" | "premium" | "ultimate"; // 新增：会员等级，可选
   createdAt: string;
 }
 
+// 其他接口保持不变
 export interface ILoginParams {
   email: string;
   password: string;

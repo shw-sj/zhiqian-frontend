@@ -355,6 +355,7 @@ const Home = () => {
 
           {/* 卡片3：创作历史 */}
           <div
+            onClick={() => navigate("/history")}
             style={{
               padding: "40px 32px",
               background: "#fff",
@@ -364,6 +365,7 @@ const Home = () => {
               transition: "all 0.3s ease",
               position: "relative",
               overflow: "hidden",
+              cursor: "pointer",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = "translateY(-4px)";
