@@ -37,7 +37,9 @@ const MainLayout = () => {
             fontSize: 20,
             color: '#1a1a1a',
             letterSpacing: '-0.02em',
+            cursor: 'pointer',
           }}
+          onClick={() => navigate('/')}
         >
           智创千面
         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // 1. 定义数据接口
 interface IHistoryItem {
@@ -11,6 +12,7 @@ interface IHistoryItem {
 
 const HistoryPage: React.FC = () => {
   const [list, setList] = useState<IHistoryItem[]>([]);
+  const navigate = useNavigate();
 
   // 2. 模拟更真实的数据用于展示
   useEffect(() => {
@@ -38,6 +40,12 @@ const HistoryPage: React.FC = () => {
           </div>
           <button className="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800 transition">
             筛选
+          </button>
+          <button
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-100 transition"
+            onClick={() => navigate('/')}
+          >
+            返回首页
           </button>
         </div>
       </div>
