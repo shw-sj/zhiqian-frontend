@@ -9,7 +9,7 @@ import Register from "../pages/Auth/Register";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
 import Profile from "../pages/Auth/Profile";
 import Home from "../pages/Home";
-import GeneratePage from "../generate";
+import ImageGenerator from "../generate/ImageGenerator";
 import History from "../pages/History";
 // 导入 D 同学的页面
 import TemplatesPage from "../pages/Templates";
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { index: true, element: <Home /> },
-      { path: "generate", element: <GeneratePage /> },
+      { path: "generate", element: <ImageGenerator /> },
       { path: "history", element: <History /> },
       { path: "templates", element: <TemplatesPage /> },
       { path: "templates/:id", element: <TemplateDetail /> },
