@@ -1,38 +1,76 @@
-import { useState } from 'react';
-import './ImageGenerator.css';
+import { useState } from "react";
+import "./ImageGenerator.css";
 
 const ImageGenerator = () => {
-  const [activeTab, setActiveTab] = useState<'standard' | 'advanced'>('standard');
+  const [activeTab, setActiveTab] = useState<"standard" | "advanced">(
+    "standard",
+  );
   const [googleSearchEnabled, setGoogleSearchEnabled] = useState(true);
-  const [prompt, setPrompt] = useState('');
-  // 新增高级模式专属状态
-  const [negativePrompt, setNegativePrompt] = useState('');
-  const [imageQuality, setImageQuality] = useState('normal');
+  const [prompt, setPrompt] = useState("");
+  const [negativePrompt, setNegativePrompt] = useState("");
+  const [imageQuality, setImageQuality] = useState("normal");
   const [imageCount, setImageCount] = useState(1);
+
+  // === 新增：大语言模型优化提示词 状态 ===
+  const [isOptimizing, setIsOptimizing] = useState(false);
+
+  // === 新增：AI 优化提示词核心函数 ===
+  const optimizePromptByLLM = async () => {
+    if (!prompt.trim()) {
+      alert("请先输入需要优化的提示词！");
+      return;
+    }
+    setIsOptimizing(true);
+    try {
+      // ==============================
+      // 这里是模拟 LLM 调用
+      // 你可以替换成真实的接口请求（Axios/Fetch）
+      // ==============================
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      // 模拟返回的优化后专业提示词
+      const optimized = `专业优化：调用大语言模型后生成`;
+
+      // 自动回填到输入框
+      setPrompt(optimized);
+      alert("提示词已由 AI 优化完成！");
+    } catch (err) {
+      alert("优化失败，请稍后重试");
+    } finally {
+      setIsOptimizing(false);
+    }
+  };
+
+  // 生成图片（保留原有逻辑）
+  const handleGenerate = () => {
+    if (!prompt.trim()) {
+      alert("请输入提示词！");
+      return;
+    }
+    alert("开始生成图片...");
+  };
 
   return (
     <div className="generator-container">
-      {/* 左侧：生成器配置区 */}
       <div className="generator-left">
         <h1 className="generator-title">图片生成器</h1>
 
         {/* 标签栏 */}
         <div className="tab-bar">
           <button
-            className={`tab-button ${activeTab === 'standard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('standard')}
+            className={`tab-button ${activeTab === "standard" ? "active" : ""}`}
+            onClick={() => setActiveTab("standard")}
           >
             标准
           </button>
           <button
-            className={`tab-button ${activeTab === 'advanced' ? 'active' : ''}`}
-            onClick={() => setActiveTab('advanced')}
+            className={`tab-button ${activeTab === "advanced" ? "active" : ""}`}
+            onClick={() => setActiveTab("advanced")}
           >
             高级 <span className="new-badge">NEW</span>
           </button>
         </div>
 
-        {/* 共享配置项 - 两个标签页都显示 */}
         {/* 风格选择 */}
         <div className="form-group">
           <label className="form-label">风格</label>
@@ -97,13 +135,13 @@ const ImageGenerator = () => {
           </div>
         </div>
 
-        {/* 高级标签页专属配置项 - 仅在高级模式显示 */}
-        {activeTab === 'advanced' && (
+        {/* 高级选项 */}
+        {activeTab === "advanced" && (
           <div className="advanced-options">
             <div className="form-group">
               <label className="form-label">图片质量</label>
-              <select 
-                className="form-select" 
+              <select
+                className="form-select"
                 value={imageQuality}
                 onChange={(e) => setImageQuality(e.target.value)}
               >
@@ -115,8 +153,8 @@ const ImageGenerator = () => {
 
             <div className="form-group">
               <label className="form-label">生成数量</label>
-              <select 
-                className="form-select" 
+              <select
+                className="form-select"
                 value={imageCount}
                 onChange={(e) => setImageCount(Number(e.target.value))}
               >
@@ -140,9 +178,19 @@ const ImageGenerator = () => {
           </div>
         )}
 
-        {/* 提示词输入 */}
+        {/* 提示词输入 + AI 优化按钮 */}
         <div className="form-group">
-          <label className="form-label">提示词</label>
+          <label className="form-label">
+            提示词
+            {/* === 新增：AI 优化按钮 === */}
+            <button
+              className={`optimize-btn ${isOptimizing ? "loading" : ""}`}
+              onClick={optimizePromptByLLM}
+              disabled={isOptimizing}
+            >
+              {isOptimizing ? "优化中..." : "🤖 AI 优化提示词"}
+            </button>
+          </label>
           <textarea
             className="prompt-input"
             value={prompt}
@@ -153,17 +201,18 @@ const ImageGenerator = () => {
           <div className="char-count">{prompt.length} / 15000</div>
         </div>
 
-        {/* 消耗与生成按钮 */}
+        {/* 消耗与生成 */}
         <div className="cost-section">
-          {/* 高级模式消耗更多积分 */}
-          <p className="cost-text">消耗 {activeTab === 'standard' ? 5 : 10} 积分</p>
-          <button className="generate-button">
-            <span className="icon">👤</span> 登录生成图片
+          <p className="cost-text">
+            消耗 {activeTab === "standard" ? 5 : 10} 积分
+          </p>
+          <button className="generate-button" onClick={handleGenerate}>
+            <span className="icon">👤</span>生成图片
           </button>
         </div>
       </div>
 
-      {/* 右侧：预览区 */}
+      {/* 右侧预览区 */}
       <div className="generator-right">
         <div className="preview-header">
           <span className="preview-icon">🖼</span>

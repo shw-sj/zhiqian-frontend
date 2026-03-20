@@ -311,4 +311,23 @@ input:checked + .toggle-slider:before {
   background-position: center;
   pointer-events: none;
   opacity: 0.08; /* 降低透明度，适配白色背景 */
+  /* AI 优化提示词按钮 */
+  .optimize-btn {
+    margin-left: 12px;
+    padding: 4px 10px;
+    font-size: 12px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .optimize-btn:hover {
+    background: #4338ca;
+  }
+  .optimize-btn.loading {
+    background: #94a3b8;
+    cursor: not-allowed;
+  }
 }
