@@ -11,7 +11,7 @@ const ImageGenerator = () => {
   const [imageQuality, setImageQuality] = useState("normal");
   const [imageCount, setImageCount] = useState(1);
   const AI_API_URL = "https://yunwu.ai/v1/chat/completions";
-  const AI_API_KEY = "sk-4lvPRvwk46HunooWIsgtSWCvGJtR0gJlbCITlOhHT10fuCSm";
+  const AI_API_KEY = "sk-k6tKj1itv4jZaRnPF6KJsYtXWJSxsGCAWiNeq7u3KE4nc9yw";
   // === 新增：大语言模型优化提示词 状态 ===
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]); // 新增：存放图片
