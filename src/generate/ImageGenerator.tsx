@@ -10,9 +10,12 @@ const ImageGenerator = () => {
   const [negativePrompt, setNegativePrompt] = useState("");
   const [imageQuality, setImageQuality] = useState("normal");
   const [imageCount, setImageCount] = useState(1);
-
+  const AI_API_URL = "https://yunwu.ai/v1/chat/completions";
+  const AI_API_KEY = "sk-4lvPRvwk46HunooWIsgtSWCvGJtR0gJlbCITlOhHT10fuCSm";
   // === 新增：大语言模型优化提示词 状态 ===
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]); // 新增：存放图片
+  const [isGenerating, setIsGenerating] = useState(false); // 新增：加载状态
 
   // === 新增：AI 优化提示词核心函数 ===
   const optimizePromptByLLM = async () => {
@@ -22,32 +25,126 @@ const ImageGenerator = () => {
     }
     setIsOptimizing(true);
     try {
-      // ==============================
-      // 这里是模拟 LLM 调用
-      // 你可以替换成真实的接口请求（Axios/Fetch）
-      // ==============================
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const response = await fetch(AI_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${AI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-5.4-mini",
+          messages: [
+            {
+              role: "system",
+              content:
+                "你是专业提示词优化师，擅长把普通文本优化成专业、清晰、可直接用于大模型生成图片的高质量提示词。只返回优化后的结果，不要多余解释。",
+            },
+            {
+              role: "user",
+              content: `请优化以下提示词：${prompt}`,
+            },
+          ],
+        }),
+      });
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const html = await response.text();
+        throw new Error(
+          `接口返回非JSON，可能是参数错误/认证失败：${html.slice(0, 50)}`,
+        );
+      }
+      if (!response.ok) {
+        throw new Error("AI 接口请求失败");
+      }
 
-      // 模拟返回的优化后专业提示词
-      const optimized = `专业优化：调用大语言模型后生成`;
+      const data = await response.json();
+      const optimizedPrompt = data.choices[0].message.content.trim();
 
-      // 自动回填到输入框
-      setPrompt(optimized);
-      alert("提示词已由 AI 优化完成！");
+      // 回填到输入框
+      setPrompt(optimizedPrompt);
+      alert("✅ 提示词已由 AI 优化完成！");
     } catch (err) {
-      alert("优化失败，请稍后重试");
+      console.error("优化出错：", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "未知错误，请检查网络或API配置";
+      alert(`❌ 优化失败：\n${errorMessage}`);
     } finally {
       setIsOptimizing(false);
     }
   };
 
   // 生成图片（保留原有逻辑）
-  const handleGenerate = () => {
+
+  const handleGenerate = async () => {
     if (!prompt.trim()) {
       alert("请输入提示词！");
       return;
     }
-    alert("开始生成图片...");
+
+    setIsGenerating(true);
+    setGeneratedImages([]);
+
+    try {
+      const response = await fetch("https://yunwu.ai/v1/images/generations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${AI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-image-1.5",
+          prompt: prompt,
+          negative_prompt: negativePrompt,
+          quality: imageQuality,
+          n: imageCount,
+          response_format: "b64_json", // 明确告诉接口返回 base64
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("接口错误：", errorData);
+        throw new Error(`请求失败，状态码：${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("✅ AI 返回完整数据：", data);
+
+      const imageUrls: string[] = [];
+
+      // --------------------------
+      // 核心修改：读取 b64_json
+      // --------------------------
+      if (data.data && Array.isArray(data.data)) {
+        data.data.forEach((item: any) => {
+          // 1. 优先取 base64
+          if (item.b64_json) {
+            // 拼接成可直接渲染的图片格式
+            const base64Url = `data:image/png;base64,${item.b64_json}`;
+            imageUrls.push(base64Url);
+          }
+          // 2. 兼容备用 url
+          else if (item.url) {
+            imageUrls.push(item.url);
+          }
+        });
+      } else {
+        throw new Error("未返回有效图片数据，请查看控制台输出");
+      }
+
+      if (imageUrls.length === 0) {
+        throw new Error("图片生成成功，但未获取到图片");
+      }
+
+      setGeneratedImages(imageUrls);
+      alert("✅ 图片生成成功！");
+    } catch (err) {
+      console.error("生成失败：", err);
+      const msg = err instanceof Error ? err.message : "未知错误";
+      alert(`❌ 失败：${msg}`);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -173,7 +270,9 @@ const ImageGenerator = () => {
                 placeholder="例如：模糊、低分辨率、水印"
                 maxLength={5000}
               />
-              <div className="char-count">{negativePrompt.length} / 5000</div>
+              <div className="char-count">
+                {(negativePrompt || "").length} / 5000
+              </div>
             </div>
           </div>
         )}
@@ -198,7 +297,7 @@ const ImageGenerator = () => {
             placeholder="例如：生成一个关于洗发水的广告"
             maxLength={15000}
           />
-          <div className="char-count">{prompt.length} / 15000</div>
+          <div className="char-count">{(prompt || "").length}/ 15000</div>
         </div>
 
         {/* 消耗与生成 */}
@@ -218,11 +317,28 @@ const ImageGenerator = () => {
           <span className="preview-icon">🖼</span>
           <h2 className="preview-title">图片预览</h2>
         </div>
-        <div className="preview-box">
-          <div className="preview-placeholder">
-            <span className="placeholder-icon">🖼</span>
-            <p className="placeholder-text">没有生成图片</p>
-          </div>
+        <div
+          className="preview-box"
+          style={{ padding: "10px", minHeight: 300 }}
+        >
+          {isGenerating ? (
+            <div className="loading-text">🎨 正在生成图片...</div>
+          ) : generatedImages.length > 0 && generatedImages[0] ? (
+            <img
+              src={generatedImages[0]}
+              style={{ width: "100%", borderRadius: 8 }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src =
+                  "https://placehold.co/600x400?text=图片加载失败";
+                alert("图片地址：\n" + generatedImages[0]);
+              }}
+            />
+          ) : (
+            <div className="preview-placeholder">
+              <span className="placeholder-icon">🖼</span>
+              <p className="placeholder-text">没有生成图片</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
