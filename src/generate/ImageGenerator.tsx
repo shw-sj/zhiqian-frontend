@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./ImageGenerator.css";
+import {
+  appendHistoryItems,
+  consumePendingPrompt,
+  type HistoryItem,
+} from "../pages/History/storage";
 
 const ImageGenerator = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"standard" | "advanced">(
     "standard",
   );
@@ -10,12 +17,31 @@ const ImageGenerator = () => {
   const [negativePrompt, setNegativePrompt] = useState("");
   const [imageQuality, setImageQuality] = useState("normal");
   const [imageCount, setImageCount] = useState(1);
+  const [selectedStyle, setSelectedStyle] = useState("卡通");
+  const [selectedModel, setSelectedModel] = useState("zhiqian");
+  const [aspectRatio, setAspectRatio] = useState<"1:1" | "16:9" | "9:16">(
+    "1:1",
+  );
+  const [imageResolution, setImageResolution] = useState<"1K" | "2K" | "4K">(
+    "1K",
+  );
+  const [outputFormat, setOutputFormat] = useState<"PNG" | "JPG" | "WebP">(
+    "WebP",
+  );
   const AI_API_URL = "https://yunwu.ai/v1/chat/completions";
   const AI_API_KEY = "sk-k6tKj1itv4jZaRnPF6KJsYtXWJSxsGCAWiNeq7u3KE4nc9yw";
   // === 新增：大语言模型优化提示词 状态 ===
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]); // 新增：存放图片
   const [isGenerating, setIsGenerating] = useState(false); // 新增：加载状态
+
+  useEffect(() => {
+    const pendingPrompt = consumePendingPrompt();
+    if (pendingPrompt && pendingPrompt.prompt.trim()) {
+      setPrompt(pendingPrompt.prompt);
+      setNegativePrompt(pendingPrompt.negativePrompt ?? "");
+    }
+  }, []);
 
   // === 新增：AI 优化提示词核心函数 ===
   const optimizePromptByLLM = async () => {
@@ -73,6 +99,81 @@ const ImageGenerator = () => {
     }
   };
 
+  const buildAugmentedPrompt = (): string => {
+    const basePrompt = prompt.trim();
+    if (!basePrompt) return "";
+    // 如果历史/模板复用时 prompt 已经是“带参数的增强版”，避免重复拼接
+    const alreadyAugmented =
+      basePrompt.includes("风格：") &&
+      basePrompt.includes("模型：") &&
+      basePrompt.includes("宽高比：") &&
+      basePrompt.includes("分辨率：");
+    if (alreadyAugmented) return basePrompt;
+    // 把界面选项写进提示词，确保“再次生成/历史复用”也能带上这些参数
+    return [
+      basePrompt,
+      `风格：${selectedStyle}`,
+      `模型：${selectedModel}`,
+      `宽高比：${aspectRatio}`,
+      `分辨率：${imageResolution}`,
+      `输出格式：${outputFormat}`,
+      `质量：${imageQuality}`,
+    ].join("，");
+  };
+
+  const loadImage = (src: string): Promise<HTMLImageElement> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () =>
+        reject(new Error("图片加载失败，请检查生成结果或网络"));
+      img.src = src;
+    });
+  };
+
+  const applyWatermarkAndConvert = async (
+    srcDataUrl: string,
+  ): Promise<string> => {
+    const img = await loadImage(srcDataUrl);
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth || img.width;
+    canvas.height = img.naturalHeight || img.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas 2D context 不可用");
+
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // 透明水印：底部右侧
+    const text = "智千";
+    const paddingX = Math.max(16, Math.floor(canvas.width * 0.03));
+    const paddingY = Math.max(12, Math.floor(canvas.height * 0.03));
+    const fontSize = Math.max(18, Math.floor(canvas.width / 10));
+
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "bottom";
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = "rgba(0,0,0,0.18)";
+    ctx.lineWidth = Math.max(2, Math.floor(fontSize * 0.08));
+
+    const x = canvas.width - paddingX;
+    const y = canvas.height - paddingY;
+    ctx.strokeText(text, x, y);
+    ctx.fillText(text, x, y);
+    ctx.restore();
+
+    const quality = 0.92;
+    if (outputFormat === "JPG") {
+      return canvas.toDataURL("image/jpeg", quality);
+    }
+    if (outputFormat === "WebP") {
+      return canvas.toDataURL("image/webp", quality);
+    }
+    return canvas.toDataURL("image/png");
+  };
+
   // 生成图片（保留原有逻辑）
 
   const handleGenerate = async () => {
@@ -85,6 +186,11 @@ const ImageGenerator = () => {
     setGeneratedImages([]);
 
     try {
+      const augmentedPrompt = buildAugmentedPrompt();
+      if (!augmentedPrompt) {
+        alert("提示词为空，无法生成");
+        return;
+      }
       const response = await fetch("https://yunwu.ai/v1/images/generations", {
         method: "POST",
         headers: {
@@ -92,12 +198,13 @@ const ImageGenerator = () => {
           Authorization: `Bearer ${AI_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "gpt-image-1.5",
-          prompt: prompt,
+          model: "doubao-seedream-4-0-250828",
+          prompt: augmentedPrompt,
           negative_prompt: negativePrompt,
           quality: imageQuality,
           n: imageCount,
           response_format: "b64_json", // 明确告诉接口返回 base64
+          // 移除size参数，使用API默认尺寸，避免API不支持的尺寸值导致失败
         }),
       });
 
@@ -136,7 +243,21 @@ const ImageGenerator = () => {
         throw new Error("图片生成成功，但未获取到图片");
       }
 
+      // 简化处理，直接使用原始图片URL，避免水印处理可能导致的问题
+      console.log("图片生成成功，获取到的图片数量：", imageUrls.length);
       setGeneratedImages(imageUrls);
+      console.log("已更新generatedImages状态");
+      const now = new Date();
+      const nextHistoryItems: HistoryItem[] = imageUrls.map(
+        (url, index) => ({
+          id: `${now.getTime()}-${index}`,
+          url,
+          prompt: augmentedPrompt,
+          createdAt: now.toISOString(),
+          tag: activeTab === "advanced" ? "高级生成" : "标准生成",
+        }),
+      );
+      appendHistoryItems(nextHistoryItems);
       alert("✅ 图片生成成功！");
     } catch (err) {
       console.error("生成失败：", err);
@@ -171,20 +292,27 @@ const ImageGenerator = () => {
         {/* 风格选择 */}
         <div className="form-group">
           <label className="form-label">风格</label>
-          <select className="form-select">
-            <option>卡通</option>
-            <option>写实</option>
-            <option>艺术</option>
-            <option>其他</option>
+          <select
+            className="form-select"
+            value={selectedStyle}
+            onChange={(e) => setSelectedStyle(e.target.value)}
+          >
+            <option value="卡通">卡通</option>
+            <option value="写实">写实</option>
+            <option value="艺术">艺术</option>
+            <option value="其他">其他</option>
           </select>
         </div>
 
         {/* 模型选择 */}
         <div className="form-group">
           <label className="form-label">模型</label>
-          <select className="form-select">
-            <option>暂无</option>
-            <option>暂无</option>
+          <select
+            className="form-select"
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+          >
+            <option value="zhiqian">zhiqian</option>
           </select>
         </div>
 
@@ -208,26 +336,44 @@ const ImageGenerator = () => {
         <div className="params-row">
           <div className="form-group">
             <label className="form-label">宽高比</label>
-            <select className="form-select">
-              <option>1:1 (正方形)</option>
-              <option>16:9 (横版)</option>
-              <option>9:16 (竖版)</option>
+            <select
+              className="form-select"
+              value={aspectRatio}
+              onChange={(e) =>
+                setAspectRatio(e.target.value as "1:1" | "16:9" | "9:16")
+              }
+            >
+              <option value="1:1">1:1 (正方形)</option>
+              <option value="16:9">16:9 (横版)</option>
+              <option value="9:16">9:16 (竖版)</option>
             </select>
           </div>
           <div className="form-group">
             <label className="form-label">分辨率</label>
-            <select className="form-select">
-              <option>1K</option>
-              <option>2K</option>
-              <option>4K</option>
+            <select
+              className="form-select"
+              value={imageResolution}
+              onChange={(e) =>
+                setImageResolution(e.target.value as "1K" | "2K" | "4K")
+              }
+            >
+              <option value="1K">1K</option>
+              <option value="2K">2K</option>
+              <option value="4K">4K</option>
             </select>
           </div>
           <div className="form-group">
             <label className="form-label">格式</label>
-            <select className="form-select">
-              <option>PNG</option>
-              <option>JPG</option>
-              <option>WebP</option>
+            <select
+              className="form-select"
+              value={outputFormat}
+              onChange={(e) =>
+                setOutputFormat(e.target.value as "PNG" | "JPG" | "WebP")
+              }
+            >
+              <option value="PNG">PNG</option>
+              <option value="JPG">JPG</option>
+              <option value="WebP">WebP</option>
             </select>
           </div>
         </div>
@@ -305,8 +451,16 @@ const ImageGenerator = () => {
           <p className="cost-text">
             消耗 {activeTab === "standard" ? 5 : 10} 积分
           </p>
-          <button className="generate-button" onClick={handleGenerate}>
+          <button className="generate-button" onClick={handleGenerate} disabled={isGenerating}>
             <span className="icon">👤</span>生成图片
+          </button>
+          <button
+            className="generate-button"
+            style={{ marginLeft: 10, background: "#fff", color: "#111", border: "1px solid #ddd" }}
+            onClick={() => navigate("/history")}
+            type="button"
+          >
+            查看历史
           </button>
         </div>
       </div>
@@ -319,20 +473,48 @@ const ImageGenerator = () => {
         </div>
         <div
           className="preview-box"
-          style={{ padding: "10px", minHeight: 300 }}
+          style={{ padding: "10px", minHeight: 500 }}
         >
           {isGenerating ? (
             <div className="loading-text">🎨 正在生成图片...</div>
-          ) : generatedImages.length > 0 && generatedImages[0] ? (
-            <img
-              src={generatedImages[0]}
-              style={{ width: "100%", borderRadius: 8 }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  "https://placehold.co/600x400?text=图片加载失败";
-                alert("图片地址：\n" + generatedImages[0]);
+          ) : generatedImages.length > 0 ? (
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 8,
+                height: "100%"
               }}
-            />
+            >
+              {generatedImages.map((imageUrl, index) => (
+                <div
+                  key={`${imageUrl}-${index}`}
+                  style={{
+                    flex: "1 1 calc(50% - 4px)",
+                    minWidth: "200px",
+                    height: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
+                  <img
+                    src={imageUrl}
+                    style={{ 
+                      width: "100%", 
+                      height: "auto",
+                      maxHeight: "100%",
+                      objectFit: "contain",
+                      borderRadius: 8 
+                    }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "https://placehold.co/800x600?text=图片加载失败";
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
           ) : (
             <div className="preview-placeholder">
               <span className="placeholder-icon">🖼</span>

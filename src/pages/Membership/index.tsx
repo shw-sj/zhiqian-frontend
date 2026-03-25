@@ -6,7 +6,7 @@ import { mockPlans } from "./mockData";
 import styles from "./style.module.css";
 
 const MembershipPage: React.FC = () => {
-  const user = useSelector((state: RootState) => state.user.user); // 从 Redux 获取用户
+  const user = useSelector((state: RootState) => state.user.userInfo); // 从 Redux 获取用户
 
   return (
     <div className={styles.container}>

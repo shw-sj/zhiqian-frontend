@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../../../store";
@@ -14,6 +14,28 @@ const TemplateCard: React.FC<Props> = ({ template }) => {
   const navigate = useNavigate();
   const isLoggedIn = useSelector((state: RootState) => state.user.isLoggedIn);
   const [liked, setLiked] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // 随机选择一张图片
+  const selectRandomImage = () => {
+    if (template.cover.length > 1) {
+      const randomIndex = Math.floor(Math.random() * template.cover.length);
+      setCurrentImageIndex(randomIndex);
+    }
+  };
+
+  // 组件加载时随机选择一张图片
+  useEffect(() => {
+    selectRandomImage();
+  }, [template.cover]);
+
+  // 自动切换图片（每3秒）
+  useEffect(() => {
+    if (template.cover.length > 1) {
+      const interval = setInterval(selectRandomImage, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [template.cover]);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -32,7 +54,7 @@ const TemplateCard: React.FC<Props> = ({ template }) => {
     >
       <div className={styles.imageWrapper}>
         <img
-          src={template.cover}
+          src={template.cover[currentImageIndex]}
           alt={template.title}
           className={styles.cover}
         />

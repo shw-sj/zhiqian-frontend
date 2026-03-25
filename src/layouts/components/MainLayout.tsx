@@ -42,13 +42,12 @@ const MainLayout = () => {
             letterSpacing: "-0.02em",
             cursor: "pointer",
           }}
-          onClick={() => navigate("/")}
         >
           智创千面
         </div>
         <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
           <Link
-            to="/"
+            to="/generate"
             style={{
               color: "#666",
               fontSize: 15,

@@ -1,33 +1,33 @@
 import React from "react";
-import styles from "./style.module.css";
+import stylesModule from "./style.module.css";
 
-interface Style {
+export interface StyleOption {
   id: string;
   name: string;
   preview: string;
 }
 
 interface Props {
-  styles: Style[];
+  options: StyleOption[];
   selected: string;
   onSelect: (styleId: string) => void;
 }
 
-const StyleSelector: React.FC<Props> = ({ styles, selected, onSelect }) => {
+const StyleSelector: React.FC<Props> = ({ options, selected, onSelect }) => {
   return (
-    <div className={styles.selector}>
+    <div className={stylesModule.selector}>
       <h3>选择风格变体</h3>
-      <div className={styles.list}>
-        {styles.map((style) => (
+      <div className={stylesModule.list}>
+        {options.map((style) => (
           <div
             key={style.id}
-            className={`${styles.item} ${
-              selected === style.id ? styles.active : ""
+            className={`${stylesModule.item} ${
+              selected === style.id ? stylesModule.active : ""
             }`}
             onClick={() => onSelect(style.id)}
           >
-            <span className={styles.name}>{style.name}</span>
-            <span className={styles.preview}>{style.preview}</span>
+            <span className={stylesModule.name}>{style.name}</span>
+            <span className={stylesModule.preview}>{style.preview}</span>
           </div>
         ))}
       </div>

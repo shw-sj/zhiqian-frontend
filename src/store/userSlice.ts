@@ -21,7 +21,7 @@ const createFakeUser = (email: string, username?: string): IUserInfo => {
 // 异步thunk - 登录（假登录）
 export const login = createAsyncThunk(
   'user/login',
-  async (params: { email: string; password: string }) => {
+  async (params: { email: string; password: string; remember?: boolean }) => {
     // 模拟网络延迟
     await delay(800);
     

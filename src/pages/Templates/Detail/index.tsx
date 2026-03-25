@@ -7,6 +7,7 @@ import { Button } from "../../../components/common";
 import StyleSelector from "./components/StyleSelector";
 import type { StyleOption } from "./components/StyleSelector";
 import styles from "./style.module.css";
+import { setPendingPrompt } from "../../History/storage";
 
 // 模拟风格选项
 const mockStyles: StyleOption[] = [
@@ -19,7 +20,7 @@ const TemplateDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   // 从 Redux 获取用户状态
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelector((state: RootState) => state.user.userInfo);
   const template = mockTemplates.find((t) => t.id === id);
 
   const [liked, setLiked] = useState(false);
@@ -43,6 +44,11 @@ const TemplateDetail: React.FC = () => {
       alert("请先登录");
       return;
     }
+    const pickedStyle = mockStyles.find((s) => s.id === selectedStyle);
+    const nextPrompt = pickedStyle
+      ? `${template.title}（${pickedStyle.name}）`
+      : template.title;
+    setPendingPrompt(nextPrompt);
     navigate(`/generate?template=${template.id}&style=${selectedStyle}`);
   };
 
@@ -51,7 +57,7 @@ const TemplateDetail: React.FC = () => {
       <div className={styles.main}>
         <div className={styles.imageSection}>
           <img
-            src={template.cover}
+            src={template.cover[0]}
             alt={template.title}
             className={styles.cover}
           />
@@ -72,7 +78,7 @@ const TemplateDetail: React.FC = () => {
           </div>
 
           <StyleSelector
-            styles={mockStyles}
+            options={mockStyles}
             selected={selectedStyle}
             onSelect={setSelectedStyle}
           />
