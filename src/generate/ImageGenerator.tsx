@@ -30,10 +30,22 @@ const ImageGenerator = () => {
   );
   const AI_API_URL = "https://yunwu.ai/v1/chat/completions";
   const AI_API_KEY = "sk-k6tKj1itv4jZaRnPF6KJsYtXWJSxsGCAWiNeq7u3KE4nc9yw";
-  // === 新增：大语言模型优化提示词 状态 ===
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]); // 新增：存放图片
-  const [isGenerating, setIsGenerating] = useState(false); // 新增：加载状态
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  type PromptCategory = "场景" | "物品" | "人物" | "服饰" | "环境";
+  type SceneSubCat = "室外" | "室内";
+  type ItemSubCat =
+    | "家具家居"
+    | "家用电器"
+    | "数码配件"
+    | "洗漱清洁"
+    | "日常用品";
+
+  const [activeCat, setActiveCat] = useState<PromptCategory>("场景");
+  const [sceneSubCat, setSceneSubCat] = useState<SceneSubCat>("室外");
+  const [itemSubCat, setItemSubCat] = useState<ItemSubCat>("家具家居");
 
   useEffect(() => {
     const pendingPrompt = consumePendingPrompt();
@@ -43,7 +55,6 @@ const ImageGenerator = () => {
     }
   }, []);
 
-  // === 新增：AI 优化提示词核心函数 ===
   const optimizePromptByLLM = async () => {
     if (!prompt.trim()) {
       alert("请先输入需要优化的提示词！");
@@ -58,7 +69,7 @@ const ImageGenerator = () => {
           Authorization: `Bearer ${AI_API_KEY}`,
         },
         body: JSON.stringify({
-          model: "gpt-5.4-mini",
+          model: "gpt-4o-mini",
           messages: [
             {
               role: "system",
@@ -85,8 +96,6 @@ const ImageGenerator = () => {
 
       const data = await response.json();
       const optimizedPrompt = data.choices[0].message.content.trim();
-
-      // 回填到输入框
       setPrompt(optimizedPrompt);
       alert("✅ 提示词已由 AI 优化完成！");
     } catch (err) {
@@ -102,14 +111,12 @@ const ImageGenerator = () => {
   const buildAugmentedPrompt = (): string => {
     const basePrompt = prompt.trim();
     if (!basePrompt) return "";
-    // 如果历史/模板复用时 prompt 已经是“带参数的增强版”，避免重复拼接
     const alreadyAugmented =
       basePrompt.includes("风格：") &&
       basePrompt.includes("模型：") &&
       basePrompt.includes("宽高比：") &&
       basePrompt.includes("分辨率：");
     if (alreadyAugmented) return basePrompt;
-    // 把界面选项写进提示词，确保“再次生成/历史复用”也能带上这些参数
     return [
       basePrompt,
       `风格：${selectedStyle}`,
@@ -142,8 +149,6 @@ const ImageGenerator = () => {
     if (!ctx) throw new Error("Canvas 2D context 不可用");
 
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-    // 透明水印：底部右侧
     const text = "智千";
     const paddingX = Math.max(16, Math.floor(canvas.width * 0.03));
     const paddingY = Math.max(12, Math.floor(canvas.height * 0.03));
@@ -174,8 +179,6 @@ const ImageGenerator = () => {
     return canvas.toDataURL("image/png");
   };
 
-  // 生成图片（保留原有逻辑）
-
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       alert("请输入提示词！");
@@ -203,8 +206,7 @@ const ImageGenerator = () => {
           negative_prompt: negativePrompt,
           quality: imageQuality,
           n: imageCount,
-          response_format: "b64_json", // 明确告诉接口返回 base64
-          // 移除size参数，使用API默认尺寸，避免API不支持的尺寸值导致失败
+          response_format: "b64_json",
         }),
       });
 
@@ -215,23 +217,14 @@ const ImageGenerator = () => {
       }
 
       const data = await response.json();
-      console.log("✅ AI 返回完整数据：", data);
-
       const imageUrls: string[] = [];
 
-      // --------------------------
-      // 核心修改：读取 b64_json
-      // --------------------------
       if (data.data && Array.isArray(data.data)) {
         data.data.forEach((item: any) => {
-          // 1. 优先取 base64
           if (item.b64_json) {
-            // 拼接成可直接渲染的图片格式
             const base64Url = `data:image/png;base64,${item.b64_json}`;
             imageUrls.push(base64Url);
-          }
-          // 2. 兼容备用 url
-          else if (item.url) {
+          } else if (item.url) {
             imageUrls.push(item.url);
           }
         });
@@ -243,20 +236,15 @@ const ImageGenerator = () => {
         throw new Error("图片生成成功，但未获取到图片");
       }
 
-      // 简化处理，直接使用原始图片URL，避免水印处理可能导致的问题
-      console.log("图片生成成功，获取到的图片数量：", imageUrls.length);
       setGeneratedImages(imageUrls);
-      console.log("已更新generatedImages状态");
       const now = new Date();
-      const nextHistoryItems: HistoryItem[] = imageUrls.map(
-        (url, index) => ({
-          id: `${now.getTime()}-${index}`,
-          url,
-          prompt: augmentedPrompt,
-          createdAt: now.toISOString(),
-          tag: activeTab === "advanced" ? "高级生成" : "标准生成",
-        }),
-      );
+      const nextHistoryItems: HistoryItem[] = imageUrls.map((url, index) => ({
+        id: `${now.getTime()}-${index}`,
+        url,
+        prompt: augmentedPrompt,
+        createdAt: now.toISOString(),
+        tag: activeTab === "advanced" ? "高级生成" : "标准生成",
+      }));
       appendHistoryItems(nextHistoryItems);
       alert("✅ 图片生成成功！");
     } catch (err) {
@@ -268,12 +256,119 @@ const ImageGenerator = () => {
     }
   };
 
+  const promptData = {
+    场景: {
+      室外: [
+        "城堡",
+        "城市",
+        "水上乐园",
+        "旋转木马",
+        "摩天轮",
+        "水族馆",
+        "动物园",
+        "保龄球馆",
+        "美术馆",
+        "博物馆",
+      ],
+      室内: [
+        "天文馆",
+        "游泳池",
+        "体育场",
+        "寺庙",
+        "巴士车站",
+        "火车站",
+        "喷泉",
+        "游乐场",
+        "市场摊位",
+        "电话亭",
+      ],
+    },
+    物品: {
+      家具家居: [
+        "沙发",
+        "桌子",
+        "椅子",
+        "台灯",
+        "花瓶",
+        "书架",
+        "抱枕",
+        "窗帘",
+        "收纳盒",
+      ],
+      家用电器: ["冰箱", "电视", "电脑", "风扇", "暖手宝"],
+      数码配件: ["相机", "充电宝", "数据线", "闹钟"],
+      洗漱清洁: [
+        "毛巾",
+        "牙刷",
+        "牙膏",
+        "洗发水",
+        "沐浴露",
+        "香皂",
+        "洗衣液",
+        "梳子",
+        "纸巾",
+      ],
+      日常用品: [
+        "水杯",
+        "雨伞",
+        "拖鞋",
+        "衣架",
+        "饭盒",
+        "筷子",
+        "口罩",
+        "剪刀",
+        "胶带",
+        "笔记本",
+        "签字笔",
+      ],
+    },
+    人物: [
+      "少女",
+      "少年",
+      "古风男子",
+      "古风女子",
+      "御姐",
+      "萝莉",
+      "正太",
+      "大叔",
+      "老奶奶",
+      "老爷爷",
+    ],
+    服饰: [
+      "汉服",
+      "JK制服",
+      "洛丽塔",
+      "西装",
+      "运动服",
+      "旗袍",
+      "和服",
+      "婚纱",
+      "卫衣",
+      "牛仔裤",
+    ],
+    环境: [
+      "森林",
+      "海边",
+      "雪山",
+      "沙漠",
+      "星空",
+      "雨夜",
+      "黄昏",
+      "清晨",
+      "雾天",
+      "雪天",
+    ],
+  } as const;
+
+  const insertPresetPrompt = (text: string) => {
+    setPrompt((prev) => (prev ? `${prev}，${text}` : text));
+  };
+
   return (
     <div className="generator-container">
       <div className="generator-left">
         <h1 className="generator-title">图片生成器</h1>
 
-        {/* 标签栏 */}
         <div className="tab-bar">
           <button
             className={`tab-button ${activeTab === "standard" ? "active" : ""}`}
@@ -289,7 +384,6 @@ const ImageGenerator = () => {
           </button>
         </div>
 
-        {/* 风格选择 */}
         <div className="form-group">
           <label className="form-label">风格</label>
           <select
@@ -304,7 +398,6 @@ const ImageGenerator = () => {
           </select>
         </div>
 
-        {/* 模型选择 */}
         <div className="form-group">
           <label className="form-label">模型</label>
           <select
@@ -316,7 +409,6 @@ const ImageGenerator = () => {
           </select>
         </div>
 
-        {/* Google 搜索开关 */}
         <div className="form-group toggle-group">
           <div>
             <label className="form-label">联网搜索</label>
@@ -332,7 +424,6 @@ const ImageGenerator = () => {
           </label>
         </div>
 
-        {/* 图片参数行 */}
         <div className="params-row">
           <div className="form-group">
             <label className="form-label">宽高比</label>
@@ -378,7 +469,6 @@ const ImageGenerator = () => {
           </div>
         </div>
 
-        {/* 高级选项 */}
         {activeTab === "advanced" && (
           <div className="advanced-options">
             <div className="form-group">
@@ -423,11 +513,9 @@ const ImageGenerator = () => {
           </div>
         )}
 
-        {/* 提示词输入 + AI 优化按钮 */}
         <div className="form-group">
           <label className="form-label">
             提示词
-            {/* === 新增：AI 优化按钮 === */}
             <button
               className={`optimize-btn ${isOptimizing ? "loading" : ""}`}
               onClick={optimizePromptByLLM}
@@ -446,17 +534,109 @@ const ImageGenerator = () => {
           <div className="char-count">{(prompt || "").length}/ 15000</div>
         </div>
 
-        {/* 消耗与生成 */}
+        <div className="form-group preset-prompt-group">
+          <label className="form-label">预设提示词</label>
+
+          <div className="preset-categories">
+            {(["场景", "物品", "人物", "服饰", "环境"] as const).map((cat) => (
+              <button
+                key={cat}
+                className={`preset-category-btn ${activeCat === cat ? "active" : ""}`}
+                onClick={() => setActiveCat(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {activeCat === "场景" && (
+            <div className="preset-subcategories">
+              {(["室外", "室内"] as const).map((sub) => (
+                <button
+                  key={sub}
+                  className={`preset-subcategory-btn ${sceneSubCat === sub ? "active" : ""}`}
+                  onClick={() => setSceneSubCat(sub)}
+                >
+                  {sub}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {activeCat === "物品" && (
+            <div className="preset-subcategories">
+              {(
+                [
+                  "家具家居",
+                  "家用电器",
+                  "数码配件",
+                  "洗漱清洁",
+                  "日常用品",
+                ] as const
+              ).map((sub) => (
+                <button
+                  key={sub}
+                  className={`preset-subcategory-btn ${itemSubCat === sub ? "active" : ""}`}
+                  onClick={() => setItemSubCat(sub)}
+                >
+                  {sub}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="preset-tags">
+            {activeCat === "场景"
+              ? promptData.场景[sceneSubCat].map((tag) => (
+                  <button
+                    key={tag}
+                    className="preset-tag"
+                    onClick={() => insertPresetPrompt(tag)}
+                  >
+                    {tag}
+                  </button>
+                ))
+              : activeCat === "物品"
+                ? promptData.物品[itemSubCat].map((tag) => (
+                    <button
+                      key={tag}
+                      className="preset-tag"
+                      onClick={() => insertPresetPrompt(tag)}
+                    >
+                      {tag}
+                    </button>
+                  ))
+                : promptData[activeCat].map((tag) => (
+                    <button
+                      key={tag}
+                      className="preset-tag"
+                      onClick={() => insertPresetPrompt(tag)}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+          </div>
+        </div>
+
         <div className="cost-section">
           <p className="cost-text">
             消耗 {activeTab === "standard" ? 5 : 10} 积分
           </p>
-          <button className="generate-button" onClick={handleGenerate} disabled={isGenerating}>
+          <button
+            className="generate-button"
+            onClick={handleGenerate}
+            disabled={isGenerating}
+          >
             <span className="icon">👤</span>生成图片
           </button>
           <button
             className="generate-button"
-            style={{ marginLeft: 10, background: "#fff", color: "#111", border: "1px solid #ddd" }}
+            style={{
+              marginLeft: 10,
+              background: "#fff",
+              color: "#111",
+              border: "1px solid #ddd",
+            }}
             onClick={() => navigate("/history")}
             type="button"
           >
@@ -465,7 +645,6 @@ const ImageGenerator = () => {
         </div>
       </div>
 
-      {/* 右侧预览区 */}
       <div className="generator-right">
         <div className="preview-header">
           <span className="preview-icon">🖼</span>
@@ -483,7 +662,7 @@ const ImageGenerator = () => {
                 display: "flex",
                 flexWrap: "wrap",
                 gap: 8,
-                height: "100%"
+                height: "100%",
               }}
             >
               {generatedImages.map((imageUrl, index) => (
@@ -495,17 +674,17 @@ const ImageGenerator = () => {
                     height: "100%",
                     display: "flex",
                     justifyContent: "center",
-                    alignItems: "center"
+                    alignItems: "center",
                   }}
                 >
                   <img
                     src={imageUrl}
-                    style={{ 
-                      width: "100%", 
+                    style={{
+                      width: "100%",
                       height: "auto",
                       maxHeight: "100%",
                       objectFit: "contain",
-                      borderRadius: 8 
+                      borderRadius: 8,
                     }}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src =
